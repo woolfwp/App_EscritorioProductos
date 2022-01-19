@@ -2,9 +2,11 @@ from tkinter import ttk
 from tkinter import *
 
 import sqlite3
-from tkinter.tix import COLUMN
+
 
 class Product:
+
+    db_name = 'database.db'
 
     def __init__(self, window):
         self.wind = window
@@ -40,6 +42,30 @@ class Product:
         self.tree.heading('#0' , text= 'Name ', anchor= CENTER)
         self.tree.heading('#1', text=  'Price', anchor= CENTER)
 
+        self.get_products()
+
+    #Funcion para operar con la base de datos
+    def run_query(self, query, parameters = ()): 
+        with sqlite3.connect(self.db_name) as conn:
+            cursor = conn.cursor()
+            result = cursor.execute(query, parameters)
+            conn.commit()
+        return result
+
+    def get_products(self):
+
+        #cleaning table
+        records = self.tree.get_children() 
+        for element in records:
+            self.tree.delete(element)
+        #quering date
+        query = 'SELECT * FROM product ORDER BY name DESC'
+        db_rows = self.run_query(query)
+
+        for row in db_rows:
+            #print(db_rows)
+            self.tree.insert('' , 0 ,text= row[1], values = row [2])
+           
 
 
 if __name__ == '__main__':
