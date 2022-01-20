@@ -1,7 +1,9 @@
+from inspect import Parameter
 from tkinter import ttk
 from tkinter import *
 
 import sqlite3
+from wsgiref import validate
 
 
 class Product:
@@ -33,7 +35,13 @@ class Product:
 
         #Button Add Product
 
-        ttk.Button(frame, text= ' save product').grid(row = 3 , columnspan= 2 , sticky= W + E)
+        ttk.Button(frame, text= ' save product', command= self.add_product).grid(row = 3 , columnspan= 2 , sticky= W + E)
+
+
+        #Output menssages
+
+        self.message = Label(text= '', fg = 'red')
+        self.message.grid(row=3, column= 0, columnspan= 2, sticky= W +E)
 
         #Table
 
@@ -65,7 +73,23 @@ class Product:
         for row in db_rows:
             #print(db_rows)
             self.tree.insert('' , 0 ,text= row[1], values = row [2])
-           
+
+
+    #Validacion e ingreso de datos       
+    def validation(self):
+        return len(self.name.get()) != 0 and len(self.price.get()) !=0
+
+    def add_product(self):
+        if self.validation():
+            query = 'INSERT INTO product VALUES(NULL, ?, ?)'
+            parameters = (self.name.get(), self.price.get())
+            self.run_query(query, parameters)
+            self.message['text'] = 'Product {} added Successfully'.format(self.name.get())
+            self.name.delete(0, END)
+            self.price.delete(0, END)
+        else:
+            self.message['text'] = 'Name and Price are Required'
+        self.get_products()
 
 
 if __name__ == '__main__':
