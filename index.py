@@ -50,6 +50,12 @@ class Product:
         self.tree.heading('#0' , text= 'Name ', anchor= CENTER)
         self.tree.heading('#1', text=  'Price', anchor= CENTER)
 
+        #buttons, modificar y eliminar
+
+        ttk.Button(text= 'DELETE', command= self.delete_product).grid(row= 5, column = 0, sticky= W + E)
+        ttk.Button(text= 'EDIT').grid(row= 5, column = 1, sticky= W + E)
+
+        #Filling the Row
         self.get_products()
 
     #Funcion para operar con la base de datos
@@ -91,6 +97,23 @@ class Product:
             self.message['text'] = 'Name and Price are Required'
         self.get_products()
 
+    #eliminacion de productos
+
+    def delete_product(self):
+        self.message['text'] = ''
+
+        # seleccion de item
+        try:
+            self.tree.item(self.tree.selection())['text']
+        except IndexError as e:
+            self.message['text'] = 'Please Select a Record'
+            return
+        self.message['text'] = ''
+        name = self.tree.item(self.tree.selection())['text']
+        query = 'DELETE FROM product WHERE name= ?'
+        self.run_query(query , (name, ))
+        self.message['text'] = 'Record {} deleted Successfully'.format(name)
+        self.get_products()
 
 if __name__ == '__main__':
     window = Tk()
